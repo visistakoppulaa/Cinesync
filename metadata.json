@@ -1,0 +1,6 @@
+{
+  "name": "Movie Collection API",
+  "description": "A robust, full-stack movie catalog management system featuring persistent user profiles, rating engines, watchlists, real-time shared viewing simulation, offline caching indicator, advanced analytics, and an interactive developer API playground.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
