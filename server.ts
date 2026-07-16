@@ -352,7 +352,27 @@ initDB();
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const requestedPort = parseInt(process.env.PORT || "3000", 10);
+  const preferredPort = Number.isNaN(requestedPort) ? 3000 : requestedPort;
+
+  const startListening = (port: number) => {
+    const server = app.listen(port, "0.0.0.0", () => {
+      const address = server.address();
+      const actualPort = typeof address === "object" && address ? address.port : port;
+      console.log(`Movie Collection API Server is active at http://localhost:${actualPort}`);
+    });
+
+    server.on("error", (error: NodeJS.ErrnoException) => {
+      if (error.code === "EADDRINUSE" && port < 3010) {
+        const nextPort = port + 1;
+        console.warn(`Port ${port} is already in use. Retrying on ${nextPort}...`);
+        startListening(nextPort);
+      } else {
+        console.error("Failed to start server:", error);
+        process.exit(1);
+      }
+    });
+  };
 
   // JSON Body Parser with error handling for malformed JSON
   app.use(express.json());
@@ -927,9 +947,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Movie Collection API Server is active at http://localhost:3000/${PORT}`);
-  });
+  startListening(preferredPort);
 }
 
 startServer().catch((err) => {
